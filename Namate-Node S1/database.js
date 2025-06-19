@@ -2,9 +2,10 @@ const { MongoClient } = require("mongodb");
 // We are  NOT going to Use this library...
 // We use Mongoose***
 
-const url =
-  "mongodb+srv://kartikshingde12:X9Doe2wFY5oEzJLY@namastenode.4euyrex.mongodb.net/";
+require("dotenv").config()
 
+
+const url =process.env.MONGODB_URL;
 const client = new MongoClient(url);
 
 const dbName = "HelloWorld";
