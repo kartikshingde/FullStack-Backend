@@ -18,7 +18,7 @@ app.get("/user",(req,res)=>{
 
 app.post("/user",(req,res)=>{
     // console.log("data saved successfully")
-    console.log(req.body)
+    console.log(typeof req.body.age)
     res.send("data saved successfully")
 })
 
