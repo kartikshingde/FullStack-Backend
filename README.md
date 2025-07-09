@@ -6,3 +6,9 @@ Backend Development
 
 
 <!-- DOminos Example -->
+
+HomeWork:=>
+- app.use() vs app.all()
+- Write a dummy auth middleware for admin
+- Write a dummy auth middleware for all routes, except /user/login
+- error hadling using app.use("/",(err,req,res,next)=>{})
