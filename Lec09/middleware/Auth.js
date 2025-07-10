@@ -10,4 +10,14 @@ const Auth = (req, res,next) => {
   next();
 }
 
-module.exports={Auth}
+const UserAuth=(req,res,next)=>{
+  const token="123";
+  const Access=token==="123"?1:0;
+
+  if(!Access){
+    res.status(403).send("No permission")
+  }
+  next()
+}
+
+module.exports={Auth,UserAuth}

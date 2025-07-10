@@ -2,7 +2,8 @@ const express = require("express");
 
 const app = express();
 
-const {Auth}=require("./middleware/Auth")
+const {Auth,UserAuth}=require("./middleware/Auth")
+
 
 app.use(express.json());
 
@@ -71,6 +72,44 @@ app.patch("/admin/",Auth, (req, res) => {
       res.send("Successfully Updated");
     } 
   });
+
+app.get("/user/allFoods",(req,res)=>{
+  res.send((FoodMenu));
+})
+app.post("/user/addToCart/:id",UserAuth,(req,res)=>{
+
+  const id=parseInt(req.params.id);
+  const foodIndex=FoodMenu.find((item)=>item.id===id);
+
+  if(foodIndex){
+    AddToCart.push(foodIndex);
+    res.send("Added Successfully")
+  }
+  else{
+    res.send("Failed,item doesn't exist")
+  }
+
+})
+
+app.get("/user/cart",UserAuth,(req,res)=>{
+  res.send(AddToCart);
+})
+
+app.delete("/user/deleteItem/:id",UserAuth,(req,res)=>{
+
+  const id=parseInt(req.params.id);
+  const index=FoodMenu.find((item)=>item.id===id);
+  if(index==-1){
+      res.send("Item Not Exists!")
+
+  }
+  else{
+    AddToCart.splice(index,1);
+    res.send("Deleted Successfully")
+  }
+
+})
+
 
 app.listen(5000, () => {
   console.log("Server listening at port 5000...");
