@@ -76,6 +76,7 @@ app.patch("/admin/",Auth, (req, res) => {
 app.get("/user/allFoods",(req,res)=>{
   res.send((FoodMenu));
 })
+
 app.post("/user/addToCart/:id",UserAuth,(req,res)=>{
 
   const id=parseInt(req.params.id);
@@ -92,13 +93,16 @@ app.post("/user/addToCart/:id",UserAuth,(req,res)=>{
 })
 
 app.get("/user/cart",UserAuth,(req,res)=>{
+  if(AddToCart.length==0){
+    res.send("Cart is empty.")
+  }
   res.send(AddToCart);
 })
 
 app.delete("/user/deleteItem/:id",UserAuth,(req,res)=>{
 
   const id=parseInt(req.params.id);
-  const index=FoodMenu.find((item)=>item.id===id);
+  const index=FoodMenu.findIndex((item)=>item.id===id);
   if(index==-1){
       res.send("Item Not Exists!")
 
