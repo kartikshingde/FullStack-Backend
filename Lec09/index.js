@@ -2,8 +2,7 @@ const express = require("express");
 
 const app = express();
 
-const {Auth,UserAuth}=require("./middleware/Auth")
-
+const { Auth, UserAuth } = require("./middleware/Auth");
 
 app.use(express.json());
 
@@ -37,83 +36,89 @@ app.get("/food", (req, res) => {
 // auth middleware
 // app.use("/admin",Auth );
 
-
 app.post("/admin", Auth, (req, res) => {
-
+  try{
     FoodMenu.push(req.body);
     res.status(200).send("Items added successfully");
-
+  }catch{
+    res.send("Error Occured...")
+  }
 });
 
-app.delete("/admin/:id",Auth, (req, res) => {
-  
-    const id = parseInt(req.params.id);
-    const index = FoodMenu.findIndex((item) => item.id === id);
-    if (index === -1) {
-      res.send("Item doesn't exist");
-    } else {
-      FoodMenu.splice(index, 1);
-      res.send("Item deleted successfully");
-    }
-    
-  
+app.delete("/admin/:id", Auth, (req, res) => {
+  const id = parseInt(req.params.id);
+  const index = FoodMenu.findIndex((item) => item.id === id);
+  if (index === -1) {
+    res.send("Item doesn't exist");
+  } else {
+    FoodMenu.splice(index, 1);
+    res.send("Item deleted successfully");
+  }
 });
 
-app.patch("/admin/",Auth, (req, res) => {
-  
-    const id = req.body.id;
+app.patch("/admin/", Auth, (req, res) => {
+  const id = req.body.id;
 
-    const foodData = FoodMenu.find((item) => item.id === id); //Objects are Copied by reference ***
-    if (foodData) {
-      if (req.body.food) foodData.food = req.body.food;
-      if (req.body.category) foodData.category = req.body.category;
-      if (req.body.price) foodData.price = req.body.price;
+  const foodData = FoodMenu.find((item) => item.id === id); //Objects are Copied by reference ***
+  if (foodData) {
+    if (req.body.food) foodData.food = req.body.food;
+    if (req.body.category) foodData.category = req.body.category;
+    if (req.body.price) foodData.price = req.body.price;
 
-      res.send("Successfully Updated");
-    } 
-  });
+    res.send("Successfully Updated");
+  }
+});
 
-app.get("/user/allFoods",(req,res)=>{
-  res.send((FoodMenu));
-})
+app.get("/user/allFoods", (req, res) => {
+  res.send(FoodMenu);
+});
 
-app.post("/user/addToCart/:id",UserAuth,(req,res)=>{
+app.post("/user/addToCart/:id", UserAuth, (req, res) => {
+  const id = parseInt(req.params.id);
+  const foodIndex = FoodMenu.find((item) => item.id === id);
 
-  const id=parseInt(req.params.id);
-  const foodIndex=FoodMenu.find((item)=>item.id===id);
-
-  if(foodIndex){
+  if (foodIndex) {
     AddToCart.push(foodIndex);
-    res.send("Added Successfully")
+    res.send("Added Successfully");
+  } else {
+    res.send("Failed,item doesn't exist");
   }
-  else{
-    res.send("Failed,item doesn't exist")
-  }
+});
 
-})
-
-app.get("/user/cart",UserAuth,(req,res)=>{
-  if(AddToCart.length==0){
-    res.send("Cart is empty.")
+app.get("/user/cart", UserAuth, (req, res) => {
+  if (AddToCart.length == 0) {
+    res.send("Cart is empty.");
   }
   res.send(AddToCart);
-})
+});
 
-app.delete("/user/deleteItem/:id",UserAuth,(req,res)=>{
-
-  const id=parseInt(req.params.id);
-  const index=FoodMenu.findIndex((item)=>item.id===id);
-  if(index==-1){
-      res.send("Item Not Exists!")
-
+app.delete("/user/deleteItem/:id", UserAuth, (req, res) => {
+  try {
+    const id = parseInt(req.params.id);
+    const index = FoodMenu.findIndex((item) => item.id === id);
+    if (index == -1) {
+      res.send("Item Not Exists!");
+    } else {
+      AddToCart.splice(index, 1);
+      res.send("Deleted Successfully");
+    }
+  } catch (err) {
+    res.send("Error Occured " + err);
   }
-  else{
-    AddToCart.splice(index,1);
-    res.send("Deleted Successfully")
-  }
+});
 
-})
-
+app.get("/dummy", (req, res) => {
+  // try{
+  //   // JSON.parse({"name":"rahul"});
+  //   throw new Error('BROKEN')
+  //   res.send("Hello");
+  // }
+  // catch(err){
+  //   res.send("Some Error Occured "+err)
+  // }
+  throw new Error("DB can't connect");
+  res.send("Connected");
+});
 
 app.listen(5000, () => {
   console.log("Server listening at port 5000...");
