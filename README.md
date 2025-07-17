@@ -12,3 +12,19 @@ HomeWork:=>
 - Write a dummy auth middleware for admin
 - Write a dummy auth middleware for all routes, except /user/login
 - error hadling using app.use("/",(err,req,res,next)=>{})
+
+- Create a UserSchema
+
+- Create /signup API to add data to database
+- Push some document using API with Postman
+- Error handling using try Catch.
+
+HW*
+- API- Get user by Email'
+- API - Get /feed - get all the users from the database
+- get Users BY ID;
+- create a delete user API
+- create api to update user
+- explore the mongoose documentation for Model.methods()
+- what are options in a Model.findOneAndUpdate, explore more about it
+- API - update the user with email id
