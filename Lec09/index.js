@@ -108,16 +108,16 @@ app.delete("/user/deleteItem/:id", UserAuth, (req, res) => {
 });
 
 app.get("/dummy", (req, res) => {
-  // try{
-  //   // JSON.parse({"name":"rahul"});
-  //   throw new Error('BROKEN')
-  //   res.send("Hello");
-  // }
-  // catch(err){
-  //   res.send("Some Error Occured "+err)
-  // }
-  throw new Error("DB can't connect");
-  res.send("Connected");
+  try{
+    // JSON.parse({"name":"rahul"});
+    throw new Error('BROKEN')
+    res.send("Hello");
+  }
+  catch(err){
+    res.send("Some Error Occured "+err)
+  }
+  // throw new Error("DB can't connect");
+  // res.send("Connected");
 });
 
 app.listen(5000, () => {
