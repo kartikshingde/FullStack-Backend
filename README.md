@@ -28,3 +28,10 @@ HW*
 - explore the mongoose documentation for Model.methods()
 - what are options in a Model.findOneAndUpdate, explore more about it
 - API - update the user with email id
+
+- explore Schema options from documentation
+- add required,unique,min,minLength,trim,
+- add default value
+- Create a custom validate function for gender
+- Improve the DB Schema - Put all appropriate validations on each field in Schema
+- Add timestamps

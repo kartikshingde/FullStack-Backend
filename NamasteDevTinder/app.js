@@ -7,18 +7,13 @@ const user = require("./src/models/user");
 app.use(express.json());
 
 app.post("/signup", async (req, res) => {
-  const user = new User({
-    firstName: "Virat",
-    lastName: "Kohli",
-    email: "virat@gmail.com",
-    password: "virat@321",
-  });
+  const user = new User(req.body);
 
   try {
-    user.save();
+    await user.save();
     res.send("Data Added Successfully");
   } catch (err) {
-    res.status(400).send("Some Error Occured");
+    res.status(400).send("Some Error Occured " + err.message);
   }
 });
 
@@ -61,7 +56,7 @@ app.delete("/user", async (req, res) => {
   }
 });
 
-//update data of the user
+//update data of the user with id
 app.patch("/user", async (req, res) => {
   const userId = req.body.userId;
   const data = req.body;
@@ -69,6 +64,7 @@ app.patch("/user", async (req, res) => {
   try {
     const user = await User.findByIdAndUpdate({ _id: userId }, data, {
       returnDocument: "after",
+      runValidators:true
     });
     // console.log(user)
     res.send("User Updated");
@@ -84,6 +80,7 @@ app.patch("/userByMail", async (req, res) => {
   try {
     const user = await User.findOneAndUpdate({ email: mailId }, data, {
       returnDocument: "after",
+      runValidators:true
     });
 
     res.send("User Updated Successfully");
