@@ -13,7 +13,7 @@ HomeWork:=>
 - Write a dummy auth middleware for all routes, except /user/login
 - error hadling using app.use("/",(err,req,res,next)=>{})
 
-- Create a UserSchema
+- Create a UserSchema.
 
 - Create /signup API to add data to database
 - Push some document using API with Postman
@@ -35,3 +35,11 @@ HW*
 - Create a custom validate function for gender
 - Improve the DB Schema - Put all appropriate validations on each field in Schema
 - Add timestamps
+
+- add API level validations on Patch request and signup post api
+- add api validation for each field
+// this is data sanitization
+
+-Install validator 
+-Explore validator library functions and use for password email photoUrl
+//note: NEVER TRUST req.body  ...always keep validations

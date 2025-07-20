@@ -7,8 +7,8 @@ const user = require("./src/models/user");
 app.use(express.json());
 
 app.post("/signup", async (req, res) => {
+  
   const user = new User(req.body);
-
   try {
     await user.save();
     res.send("Data Added Successfully");
@@ -57,15 +57,26 @@ app.delete("/user", async (req, res) => {
 });
 
 //update data of the user with id
-app.patch("/user", async (req, res) => {
-  const userId = req.body.userId;
+app.patch("/user/:id", async (req, res) => {
+  const userId = req.params?.id;
   const data = req.body;
 
   try {
-    const user = await User.findByIdAndUpdate({ _id: userId }, data, {
+    const ALLOWED_UPDATES = ["age", "gender", "about", "profileUrl", "skills"];
+    const isAllowed = Object.keys(data).every((k) =>
+      ALLOWED_UPDATES.includes(k)
+    );
+
+    if (!isAllowed) {
+      throw new Error("Update not allowed ");
+    }
+    const user = await User.findByIdAndUpdate(userId, data, {
       returnDocument: "after",
-      runValidators:true
+      runValidators: true,
     });
+    if (!user) {
+      res.status(404).send("User not found");
+    }
     // console.log(user)
     res.send("User Updated");
   } catch (err) {
@@ -80,7 +91,7 @@ app.patch("/userByMail", async (req, res) => {
   try {
     const user = await User.findOneAndUpdate({ email: mailId }, data, {
       returnDocument: "after",
-      runValidators:true
+      runValidators: true,
     });
 
     res.send("User Updated Successfully");
