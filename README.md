@@ -43,3 +43,8 @@ HW*
 -Install validator 
 -Explore validator library functions and use for password email photoUrl
 //note: NEVER TRUST req.body  ...always keep validations
+
+//EP09
+- validate data in SignUp API
+- Install bcrypt package
+- Create a passwordHash using bcrypt.hash() and save the user with encrypted password

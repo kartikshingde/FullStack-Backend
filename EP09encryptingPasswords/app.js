@@ -2,31 +2,35 @@ const express = require("express");
 const connectDB = require("./src/config/database");
 const app = express();
 const User = require("./src/models/user");
+const user = require("./src/models/user");
 const { validateSignUpData } = require("./src/utils/validation");
-app.use(express.json());
 const bcrypt = require("bcrypt");
+
+app.use(express.json());
 
 app.post("/signup", async (req, res) => {
   try {
-    // validate user
+    // validation of data
     validateSignUpData(req);
 
-    const { firstName, lastName, email, password } = req.body;
+    const { firstName,lastName,email,password } = req.body;
 
-    //Encrypt pass
-    const hashPass = await bcrypt.hash(password, 10);
+    // Encrypt the password
+    const passwordHash = await bcrypt.hash(password, 10);
+    // console.log(passwordHash)
 
+    //Creating a new instance of the user model
     const user = new User({
       firstName,
       lastName,
       email,
-      password: hashPass,
+      password: passwordHash,
     });
 
     await user.save();
     res.send("Data Added Successfully");
   } catch (err) {
-    res.status(400).send("Some Error Occured " + err.message);
+    res.status(400).send("Error: " + err.message);
   }
 });
 
@@ -70,30 +74,30 @@ app.delete("/user", async (req, res) => {
 });
 
 //update data of the user with id
-app.patch("/user/:id", async (req, res) => {
-  const userId = req.params?.id;
+app.patch("/user/:userId", async (req, res) => {
+  const userId = req.params?.userId;
   const data = req.body;
 
   try {
-    const ALLOWED_UPDATES = ["age", "gender", "about", "profileUrl", "skills"];
-    const isAllowed = Object.keys(data).every((k) =>
+    const ALLOWED_UPDATES = ["photoUrl", "about", "gender", "age", "skills"];
+    const isUpdateAllowed = Object.keys(data).every((k) =>
       ALLOWED_UPDATES.includes(k)
     );
 
-    if (!isAllowed) {
-      throw new Error("Update not allowed ");
+    if (!isUpdateAllowed) {
+      throw new Error("Update not allowed");
     }
-    const user = await User.findByIdAndUpdate(userId, data, {
+    if (data?.skills.length > 10) {
+      throw new Error("Skills cannot more than 10");
+    }
+    const user = await User.findByIdAndUpdate({ _id: userId }, data, {
       returnDocument: "after",
       runValidators: true,
     });
-    if (!user) {
-      res.status(404).send("User not found");
-    }
     // console.log(user)
     res.send("User Updated");
   } catch (err) {
-    res.send("Something went wrong" + err);
+    res.send("Something went wrong " + err.message);
   }
 });
 
@@ -104,7 +108,6 @@ app.patch("/userByMail", async (req, res) => {
   try {
     const user = await User.findOneAndUpdate({ email: mailId }, data, {
       returnDocument: "after",
-      runValidators: true,
     });
 
     res.send("User Updated Successfully");
