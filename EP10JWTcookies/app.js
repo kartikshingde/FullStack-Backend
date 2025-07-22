@@ -2,12 +2,12 @@ const express = require("express");
 const connectDB = require("./src/config/database");
 const app = express();
 const User = require("./src/models/user");
-const user = require("./src/models/user");
 const { validateSignUpData } = require("./src/utils/validation");
 const bcrypt = require("bcrypt");
 const validator = require("validator");
 const cookieParser = require("cookie-parser");
 const jwt = require("jsonwebtoken");
+const { userAuth } = require("./src/middlewares/auth");
 
 app.use(express.json());
 app.use(cookieParser());
@@ -53,10 +53,14 @@ app.post("/login", async (req, res) => {
 
     if (isPasswordValid) {
       // Create a jwt token
-      const token = await jwt.sign({ _id: user._id }, "DEV@Tinder$790");
+      const token = await jwt.sign(
+        { _id: user._id },
+        "notToWrite@ByMe#Generate",
+        { expiresIn: "7 d" }
+      );
 
       // Add the token to cookie and send the response back to the User
-      res.cookie("token", token);
+      res.cookie("token", token,{httpOnly:true});
 
       res.send("User login successful!!");
     } else {
@@ -68,110 +72,20 @@ app.post("/login", async (req, res) => {
 });
 
 // /profile
-app.get("/profile", async (req, res) => {
+app.get("/profile", userAuth, async (req, res) => {
   try {
-    const cookies = req.cookies;
-
-    const { token } = cookies;
-    if (!token) {
-      throw new Error("Invalid Token");
-    }
-
-    const decodedMessage = await jwt.verify(token, "DEV@Tinder$790");
-    const { _id } = decodedMessage;
-
-
-    const user = await User.findById(_id);
-    if (!user) {
-      throw new Error("User doesnot exist.");
-    }
-
+    // user is coming from auth middleware
+    const user = req.user;
     res.send(user);
   } catch (err) {
     res.send("Error: " + err.message);
   }
 });
 
-//get user by email
-app.get("/user", async (req, res) => {
-  const userEmail = req.body.email;
+app.post("/sendConnectionRequest", userAuth, async (req, res) => {
+  const user = req.user;
 
-  try {
-    const users = await User.findOne({ email: userEmail });
-    if (!users) {
-      res.send("User Not Found");
-    } else {
-      res.send(users);
-    }
-  } catch (err) {
-    res.status(400).send("Something went wrong" + err);
-  }
-});
-
-//Feed Api- GET /feed -  get all the users from the database
-app.get("/feed", async (req, res) => {
-  try {
-    const users = await User.find({});
-    res.send(users);
-  } catch (err) {
-    res.send("Something went wrong!");
-  }
-});
-
-//delete user from the database
-app.delete("/user", async (req, res) => {
-  const UserId = req.body.userId;
-
-  try {
-    // const user =await User.findByIdAndDelete({_id:userId})
-    const user = await User.findByIdAndDelete(UserId);
-    res.send("User deleted Successfully");
-  } catch (err) {
-    res.send("Something went wrong !" + err);
-  }
-});
-
-//update data of the user with id
-app.patch("/user/:userId", async (req, res) => {
-  const userId = req.params?.userId;
-  const data = req.body;
-
-  try {
-    const ALLOWED_UPDATES = ["photoUrl", "about", "gender", "age", "skills"];
-    const isUpdateAllowed = Object.keys(data).every((k) =>
-      ALLOWED_UPDATES.includes(k)
-    );
-
-    if (!isUpdateAllowed) {
-      throw new Error("Update not allowed");
-    }
-    if (data?.skills.length > 10) {
-      throw new Error("Skills cannot more than 10");
-    }
-    const user = await User.findByIdAndUpdate({ _id: userId }, data, {
-      returnDocument: "after",
-      runValidators: true,
-    });
-    // console.log(user)
-    res.send("User Updated");
-  } catch (err) {
-    res.send("Something went wrong " + err.message);
-  }
-});
-
-//update user with emailId
-app.patch("/userByMail", async (req, res) => {
-  const mailId = req.body.mailId;
-  const data = req.body;
-  try {
-    const user = await User.findOneAndUpdate({ email: mailId }, data, {
-      returnDocument: "after",
-    });
-
-    res.send("User Updated Successfully");
-  } catch (err) {
-    res.send("Something Went Wrong -> " + err);
-  }
+  res.send(user.firstName + " Sent connection request");
 });
 
 connectDB()
