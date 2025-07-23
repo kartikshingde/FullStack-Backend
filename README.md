@@ -60,3 +60,5 @@ HW*
 - userAuth middleware
 - Add the userAuth middleware in profile API and send new sendConnectionRequest API
 - Set the expiry of JWT token and cookies to 7 days
+- Crate userSchema method to getJWT()
+- Create userSchema method to comparepassword(passwordInputByUser)

@@ -8,6 +8,7 @@ const validator = require("validator");
 const cookieParser = require("cookie-parser");
 const jwt = require("jsonwebtoken");
 const { userAuth } = require("./src/middlewares/auth");
+const user = require("./src/models/user");
 app.use(express.json());
 app.use(cookieParser());
 
@@ -42,34 +43,25 @@ app.post("/login", async (req, res) => {
       throw new Error("Invalid Email Format");
     }
 
-    const userExist = await User.findOne({ email: email });
-    if (!userExist) {
+    const user = await User.findOne({ email: email });
+    if (!user) {
       throw new Error("Invalid credentials");
     }
 
-    const isPassValid = await bcrypt.compare(password, userExist.password);
+    const isPassValid = await user.validatePassword(password);
 
     if (isPassValid) {
       //jwt token
-      const token = await jwt.sign(
-        { _id: userExist._id },
-        "dont@writeByYourself#"
-      );
-      // console.log(token)
-
-      res.cookie("token", token);
-
-      res.json({ message: "Login Successful" });
-    } else {
-      res.json({ message: "Invalid credentials" });
+      const token = await user.getJWT();
+      res.status(400).send("Some Error Occured ");
     }
   } catch (err) {
-    res.status(400).send("Some Error Occured " + err.message);
+    res.send("ERROR:" + err.message);
   }
 });
 
 // /profile
-app.get("/profile",userAuth, async (req, res) => {
+app.get("/profile", userAuth, async (req, res) => {
   try {
     const user = req.user;
     res.send(user);
@@ -78,12 +70,10 @@ app.get("/profile",userAuth, async (req, res) => {
   }
 });
 
-app.post("/sendConnectionRequest",userAuth,async (req,res)=>{
-  
-  const {firstName}=req.user;
-  res.send(`${firstName} has sent a connection request.`)
-})
-
+app.post("/sendConnectionRequest", userAuth, async (req, res) => {
+  const { firstName } = req.user;
+  res.send(`${firstName} has sent a connection request.`);
+});
 
 //Feed Api- GET /feed -  get all the users from the database
 app.get("/feed", async (req, res) => {
@@ -94,8 +84,6 @@ app.get("/feed", async (req, res) => {
     res.send("Something went wrong!");
   }
 });
-
-
 
 connectDB()
   .then(() => {
