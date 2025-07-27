@@ -31,6 +31,9 @@ app.post("/signup", async (req, res) => {
       password: passwordHash,
     });
 
+    console.log(user);
+    
+
     await user.save();
     res.send("Data Added Successfully");
   } catch (err) {
